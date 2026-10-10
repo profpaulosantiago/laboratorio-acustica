@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Laboratório de Acústica: monte timbres somando senos, toque notas, equalize sons e veja espectro e forma de onda em tempo real.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232D70B3'/%3E%3Cpath d='M4 16c2.5-7 5-7 7.5 0s5 7 7.5 0 5-7 7.5 0' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="Laboratório de Acústica: monte timbres somando senoides, toque notas, equalize sons e veja espectro e forma de onda em tempo real.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='4' y='8' width='56' height='48' rx='9' fill='%232D70B3'/%3E%3Crect x='10' y='14' width='44' height='14' rx='3' fill='%23fff'/%3E%3Cpath d='M13 21Q17.5 15 22 21T31 21T40 21T49 21' stroke='%232D70B3' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Cg stroke='%23fff' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M15 33v17M25 33v17M35 33v17'/%3E%3C/g%3E%3Cg fill='%23F5A524'%3E%3Crect x='11.5' y='42' width='7' height='5' rx='1.5'/%3E%3Crect x='21.5' y='35' width='7' height='5' rx='1.5'/%3E%3Crect x='31.5' y='39' width='7' height='5' rx='1.5'/%3E%3C/g%3E%3Ccircle cx='48' cy='42' r='6.5' fill='%23fff'/%3E%3Cpath d='M48 42l3.2-3.6' stroke='%232D70B3' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Laboratório de Acústica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,15 +63,46 @@ select:hover{border-color:var(--muted)}
 .app{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:10px;padding-inline:16px;padding-block:10px;max-width:2000px;margin:0 auto}
 
 /* Cabeçalho: marca | abas centralizadas | aviso */
-header.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px 20px}
-.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;min-width:0}
+header.top{display:flex;align-items:center;gap:8px 16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto}
+.brand .ttl{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;min-width:0}
 .brand h1{font-family:var(--font-display);font-stretch:78%;font-weight:800;font-size:25px;line-height:1;margin:0;letter-spacing:-.01em}
-.brand span{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
-.modes{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
-.modes button{border:0;background:transparent;border-radius:999px;padding:6px 16px;font-weight:650;cursor:pointer;color:var(--muted);white-space:nowrap}
-.modes button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
-.safety{justify-self:end;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;text-align:right}
+.brand .sec{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.menubtn{flex:none;width:46px;height:46px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:3px;cursor:pointer;display:grid;place-items:center;position:relative}
+.menubtn:hover{border-color:var(--accent)}
+.menubtn .mix{width:36px;height:36px;display:block}
+.menubtn::after{content:"";position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:var(--panel);border:1px solid var(--line);
+  background-image:linear-gradient(var(--ink),var(--ink)),linear-gradient(var(--ink),var(--ink)),linear-gradient(var(--ink),var(--ink));background-size:7px 1.5px;background-repeat:no-repeat;background-position:center 4px,center 6.5px,center 9px}
+.compactbtn{display:none;flex:none;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:650;cursor:pointer;color:var(--muted)}
+.compactbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.safety{flex:none;font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;text-align:right}
 .safety b{color:var(--warn)}
+.scrim{position:fixed;inset:0;background:rgba(10,20,35,.38);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(320px,86vw);z-index:100;background:var(--panel);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(0,0,0,.18);
+  transform:translateX(-105%);transition:transform .22s ease;display:flex;flex-direction:column;padding:14px 12px;gap:12px;overflow:auto;visibility:hidden}
+body.nav-open .drawer{transform:none;visibility:visible}
+body.nav-open .scrim{opacity:1;pointer-events:auto}
+.dhead{display:flex;align-items:center;gap:10px;padding:2px 4px 10px;border-bottom:1px solid var(--line)}
+.dhead .mix{width:40px;height:40px;flex:none}
+.dhead b{font-family:var(--font-display);font-stretch:78%;font-weight:800;font-size:19px;line-height:1.1}
+.modes{display:flex;flex-direction:column;gap:4px}
+.modes button{display:flex;align-items:center;gap:12px;border:0;background:transparent;border-radius:10px;padding:10px;cursor:pointer;color:var(--ink);text-align:left}
+.modes button:hover{background:var(--chip)}
+.modes button svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--accent)}
+.modes button span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.modes button b{font-size:15px}
+.modes button small{font-size:12.5px;color:var(--muted)}
+.modes button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.modes button[aria-current="page"] svg,.modes button[aria-current="page"] small{color:var(--accent-ink)}
+.dfoot{margin:auto 4px 0;font-size:12px;color:var(--muted)}
+.fold{border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+.fold>summary{cursor:pointer;padding:7px 12px;font-size:13px;font-weight:700;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px;user-select:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:"";width:0;height:0;border-left:6px solid currentColor;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;transition:transform .15s}
+.fold[open]>summary::before{transform:rotate(90deg)}
+.fold>summary:hover{color:var(--accent)}
+.fold>.fbody{padding:0 12px 10px}
+.fold>.fbody>p{margin:6px 0 0}
 
 /* Área de trabalho: visores | controles */
 .work{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:12px;min-height:0}
@@ -100,7 +131,9 @@ kbd{font-family:var(--font-mono);font-size:10.5px;border:1px solid var(--line);b
 .tsrc{display:flex;align-items:center;gap:8px;flex:0 0 50%;min-width:0}
 .tsrc select{flex:1 1 0;width:0;font-weight:650;font-size:14.5px;padding-block:8px}
 .tlab{flex:none;font-size:13.5px;font-weight:600;color:var(--muted)}
-.play{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:9px 14px;font-weight:700;cursor:pointer;min-width:104px;justify-content:center;flex:none}
+.play .ptxt{display:none}
+.play{display:inline-flex;align-items:center;background:var(--accent);color:var(--accent-ink);border:0;border-radius:50%;width:42px;height:42px;padding:0;cursor:pointer;justify-content:center;flex:none}
+.play[aria-pressed="true"]{background:var(--danger)}
 .play svg{width:15px;height:15px;fill:currentColor}
 .tctl{display:flex;align-items:center;gap:14px;flex:1 1 auto;min-width:0;justify-content:flex-end}
 .eqswitch{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 5px;background:var(--panel-2);cursor:pointer;font-weight:600;font-size:13.5px;white-space:nowrap}
@@ -212,7 +245,7 @@ kbd{font-family:var(--font-mono);font-size:10.5px;border:1px solid var(--line);b
 .pl .marks i.m1{background:var(--mid);border-color:var(--mid)}
 .pl .marks i.m0{background:var(--bad-soft);border-color:var(--bad)}
 .pl .marks i.gap{margin-left:5px}
-.about{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.about .fbody{display:flex;flex-direction:column;gap:6px}
 .about p{margin:0;font-size:13px;color:var(--muted)}
 .rules{font-size:12.5px;color:var(--muted);margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
 .rules b{color:var(--ink)}
@@ -225,7 +258,8 @@ table.res td.t{font-weight:700;font-family:var(--font-mono)}
 
 /* Teclado */
 .kb{display:flex;flex-direction:column;gap:10px}
-.kbctl{display:grid;grid-template-columns:1.4fr auto 1fr;gap:8px 10px;align-items:end}
+.kbctl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px;align-items:end}
+.kbinst select{width:100%}
 .kbctl .field select{width:100%}
 .oct{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
 .oct button{border:0;background:var(--panel-2);width:32px;height:34px;cursor:pointer;font-size:17px;font-weight:700}
@@ -310,12 +344,11 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
 @media (max-height:820px) and (min-width:1181px){
   .app{gap:8px;padding-block:8px}
   .brand h1{font-size:21px}
-  .modes button{padding:4px 12px}
   .work{gap:10px}
   .col{gap:8px}
   .pad{padding:9px 10px}
   .transport{height:48px;padding:0 10px;gap:10px}
-  .play{padding:7px 12px;min-width:92px}
+  .play{width:38px;height:38px}
   .tsrc select{padding-block:6px}
   .eqswitch .long{display:none}
   .eqswitch .short{display:inline}
@@ -328,8 +361,12 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
   .readout{padding:4px 10px}
   .keys{--kbh:120px}
   .game{gap:9px}
-  .about p{display:none}
-  body.m-kb #kbHint, body.m-kb #resetRow, body.m-kb #eqBox .pdesc{display:none}
+  body.m-kb #resetRow, body.m-kb #eqBox .pdesc{display:none}
+  .menubtn{width:38px;height:38px;border-radius:10px} .menubtn .mix{width:30px;height:30px}
+  .kbinst{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
+  .kbinst select{padding-block:5px}
+  .keys{--kbh:104px}
+  .fold>summary{padding:5px 12px}
 }
 
 /* Telas estreitas (celular, tablet em pé): tudo empilhado, página rola */
@@ -342,19 +379,27 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
   #eqBox{order:40} #filtersBox{order:50}
   #gamePanel,#kbPanel{order:5}
   body.m-game .transport{display:none}
+  .compactbtn{display:inline-block}
+  /* Modo compacto: só o essencial de cada seção */
+  body.compact #specScreen{height:250px} body.compact #wvScreen{height:200px}
+  body.compact .screen-head .legend, body.compact .readout, body.compact #filtersBox,
+  body.compact #eqBox .pdesc, body.compact #resetRow, body.compact #resetHint{display:none}
+  body.compact.m-kb .transport{order:45}
+  body.compact.m-game #wvScreen{display:none}
+  body.compact .tb-desc, body.compact .tb-meta{display:none}
+  body.compact .tb-plot.big{height:180px}
+  body.compact .tb-plot.tb-mini{height:96px}
+  body.compact .tb-comp{gap:8px;padding:10px}
 }
 @media (max-width:760px){
-  header.top{grid-template-columns:minmax(0,1fr)}
-  .brand{justify-content:space-between}
-  .modes{width:100%}
-  .modes button{flex:1 1 0;padding:7px 2px;font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .safety{justify-self:start;text-align:left}
+  .safety{display:none}
+  .brand h1{font-size:19px}
+  .menubtn{width:42px;height:42px}
+  .menubtn .mix{width:32px;height:32px}
   .transport{flex-direction:column;align-items:stretch;height:auto;padding:8px 12px;gap:8px}
   .tsrc,.tctl{flex:none;min-width:0;width:100%}
   body.m-kb .tsrc{display:none}
   .eqswitch{flex:none}
-  .play{min-width:0;width:46px;height:40px;padding:0}
-  .play .ptxt{display:none}
   .tctl{justify-content:space-between;gap:10px}
   body.m-game .tsrc{display:none}
   .vol{flex:1 1 auto;justify-content:flex-end}
@@ -363,63 +408,72 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
   .vs{width:26px} .vs-thumb{width:22px}
   .band .rg{display:none}
   .eqhead select{max-width:none;flex:1 1 180px}
-  .kbctl{grid-template-columns:1fr 1fr}
-  .kbctl .field:first-child{grid-column:1/-1}
   .readout{gap:4px 14px}
 }
 
 /* ===== Aba Timbres (estúdio de timbres) ===== */
 .tb-page{overflow:auto;min-height:0}
-.tb-inner{max-width:1240px;margin:0 auto;padding-block:0 28px}
+.tb-inner{padding-block:0 28px;padding-inline:2px}
 .tb-top{position:sticky;top:0;z-index:5;background:var(--bg);padding-block:2px 10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
-.tb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.tb-bar .tb-pick{display:flex;align-items:center;gap:8px;flex:1 1 360px;min-width:0}
-.tb-bar .tb-pick label{font-weight:700;font-size:13.5px;color:var(--muted)}
-.tb-bar select{flex:1 1 0;width:0;min-width:0;font-weight:700;font-size:14.5px;padding-block:8px}
-.tb-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;padding:9px 16px;cursor:pointer;white-space:nowrap}
-.tb-btn svg{width:15px;height:15px;fill:currentColor}
-.tb-btn.pri{border:0;background:var(--accent);color:var(--accent-ink);min-width:110px}
-.tb-btn.pri[aria-pressed="true"]{background:var(--danger)}
-.tb-btn.sec{border:1.5px solid var(--accent);background:transparent;color:var(--accent)}
-.tb-btn.sec:hover{background:var(--accent-soft)}
-.tb-desc{margin:0;font-size:13.5px;color:var(--muted);max-width:110ch}
+.tb-bar{display:flex;align-items:center;gap:8px;min-width:0}
+.tb-bar .tb-lbl{font-weight:700;font-size:13.5px;color:var(--muted);flex:none}
+.tb-bar select{flex:1 1 0;width:0;min-width:0;font-weight:700;font-size:14.5px;padding-block:9px}
+.tb-round{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0}
+.tb-round svg{width:18px;height:18px;fill:currentColor}
+.tb-round.pri{border:0;background:var(--accent);color:var(--accent-ink)}
+.tb-round.pri[aria-pressed="true"]{background:var(--danger)}
+.tb-round.sec{border:1.5px solid var(--line);background:var(--panel);color:var(--ink)}
+.tb-round.sec:hover,.tb-round.sec[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.tb-round.sec svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.tb-filewrap{position:relative;flex:none}
+.tb-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:230px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column}
+.tb-menu button{border:0;background:transparent;text-align:left;padding:9px 10px;border-radius:7px;font-size:14px;cursor:pointer;color:var(--ink)}
+.tb-menu button:hover,.tb-menu button:focus-visible{background:var(--accent-soft)}
+.tb-desc{margin:0;font-size:13.5px;color:var(--muted);max-width:120ch}
 .tb-desc b{color:var(--ink)}
-.tb-formula{margin:0;font-family:var(--font-mono);font-size:13px;line-height:1.6;overflow-wrap:anywhere;min-width:0;max-height:4.9em;overflow:auto}
+.tb-formula{margin:0;padding:0 12px 10px;font-family:var(--font-mono);font-size:13px;line-height:1.6;overflow-wrap:anywhere;min-width:0;max-height:6.5em;overflow:auto}
 .tb-formula .y,.tb-formula .op{color:var(--muted)}
 .tb-plots{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:10px}
 .tb-plotwrap{display:flex;flex-direction:column;gap:4px;min-width:0}
 .tb-plotwrap .cap{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .tb-plot{position:relative;background:var(--plot-bg);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .tb-plot canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.tb-plot.big{height:clamp(140px,27vh,270px);touch-action:none;cursor:crosshair}
-.tb-zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
-.tb-zoom button{width:30px;height:28px;border:0;background:var(--panel);display:grid;place-items:center;font-size:17px;line-height:1;cursor:pointer}
-.tb-zoom button+button{border-top:1px solid var(--line)}
+.tb-plot.big{height:clamp(150px,30vh,300px);touch-action:none;cursor:crosshair}
+.tb-zoom{position:absolute;top:6px;right:6px;display:flex;align-items:center;gap:4px;z-index:2}
+.tb-zoom .zg{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.tb-zoom .zg i{font-style:normal;font-size:12px;color:var(--muted);padding:0 4px 0 6px;line-height:1}
+.tb-zoom button{width:26px;height:26px;border:0;border-left:1px solid var(--line);background:var(--panel);display:grid;place-items:center;font-size:16px;line-height:1;cursor:pointer;padding:0;color:var(--ink)}
 .tb-zoom button:hover{background:var(--chip)}
-.tb-zoom svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-zoom .zh{border:1px solid var(--line);border-radius:6px}
+.tb-zoom svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-info{margin:0;font-size:13.5px;color:var(--muted);min-height:1.45em}
 .tb-info b{color:var(--ink);font-family:var(--font-mono);font-weight:600}
 
-.tb-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:12px 0}
-.tb-tools .grp{display:flex;align-items:center;gap:6px}
-.tb-tools .lbl{font-size:13px;color:var(--muted)}
-.tb-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel)}
-.tb-seg button{border:0;background:transparent;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--muted)}
-.tb-seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.tb-unit{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--panel);margin-top:12px}
+.tb-unit button{flex:1 1 0;border:0;background:transparent;padding:8px 10px;font-size:13.5px;cursor:pointer;color:var(--muted)}
+.tb-unit button+button{border-left:1px solid var(--line)}
+.tb-unit button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
 .tb-small{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
 .tb-small:hover{border-color:var(--accent);color:var(--accent)}
 .tb-paste{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:12px;margin-top:10px}
 .tb-paste textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:7px;padding:8px;font-family:var(--font-mono);font-size:13px;background:var(--panel);color:var(--ink);resize:vertical}
 .tb-paste .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tb-paste p{margin:0;font-size:12.5px;color:var(--muted)}
+.tb-paste .go{border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:8px 16px;cursor:pointer}
+.tb-lhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-block:14px 0}
+.tb-lhead b{flex:1 1 auto;font-size:15px}
+.tb-lhead b span{color:var(--muted);font-weight:400}
+.tb-toast{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--ink);color:var(--bg);border-radius:10px;padding:8px 8px 8px 14px;margin-top:8px;font-size:13.5px}
+.tb-toast button{border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:6px 14px;cursor:pointer}
 
-.tb-list{display:flex;flex-direction:column;gap:10px;padding-block:12px 0}
+.tb-list{display:flex;flex-direction:column;gap:10px;padding-block:10px 0}
 .tb-comp{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
 .tb-comp.off .tb-mini{opacity:.45}
 .tb-ctl{display:flex;flex-direction:column;gap:8px;min-width:0}
 .tb-chead{display:flex;align-items:center;gap:8px}
 .tb-sw{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
-.tb-chead b{flex:1 1 auto}
+.tb-chead .ttl{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tb-chead .tag{font-size:12px;font-weight:400;color:var(--muted)}
 .tb-toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
 .tb-toggle input{accent-color:var(--accent);width:16px;height:16px;margin:0}
 .tb-del{border:1px solid var(--line);background:transparent;border-radius:6px;width:30px;height:30px;display:grid;place-items:center;color:var(--muted);cursor:pointer}
@@ -433,7 +487,7 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
 .tb-step input{width:96px;border:0;background:transparent;text-align:center;font-family:var(--font-mono);font-size:14.5px;padding:5px 4px;font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
 .tb-step input::-webkit-outer-spin-button,.tb-step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .tb-meta{margin:0;font-size:12px;color:var(--muted);font-family:var(--font-mono)}
-.tb-plot.tb-mini{height:118px;min-width:0}
+.tb-plot.tb-mini{height:132px;min-width:0}
 .tb-empty{background:var(--panel);border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--muted);text-align:center}
 .tb-addwrap{padding-block:12px 0}
 .tb-add{width:100%;border:1.5px dashed var(--accent);background:transparent;color:var(--accent);border-radius:10px;padding:12px;font-weight:700;cursor:pointer}
@@ -444,31 +498,38 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
 .tb-addform .go{border:0;border-radius:7px;background:var(--accent);color:var(--accent-ink);font-weight:700;padding:8px 16px;cursor:pointer}
 .tb-addform .cancel{border:1px solid var(--line);border-radius:7px;background:transparent;padding:7px 14px;cursor:pointer}
 .tb-addform .hintline{flex-basis:100%;margin:0;font-size:12.5px;color:var(--muted)}
-@media (max-height:760px){ .tb-plot.big{height:clamp(120px,24vh,220px)} .tb-desc{display:none} }
+@media (max-height:760px){ .tb-plot.big{height:clamp(130px,26vh,240px)} .tb-desc{display:none} }
 @media (max-width:900px){
   .tb-top{position:static}
   .tb-plots{grid-template-columns:minmax(0,1fr)}
   .tb-comp{grid-template-columns:minmax(0,1fr)}
-  .tb-plot.tb-mini{height:96px}
+  .tb-plot.tb-mini{height:110px}
+  .tb-plot.big{height:clamp(150px,30vh,240px)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-</head>
-<body>
-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Laboratório de Acústica</h1></div>
-    <div class="modes" role="tablist" aria-label="Abas">
-      <button role="tab" aria-selected="true" data-mode="tb">Timbres</button>
-      <button role="tab" aria-selected="false" data-mode="kb">Teclado</button>
-      <button role="tab" aria-selected="false" data-mode="lab">Equalizador</button>
-      <button role="tab" aria-selected="false" data-mode="game">SpectroGame</button>
-      <button role="tab" aria-selected="false" data-mode="cc">Conceitos</button>
+    <div class="brand">
+      <button class="menubtn" id="menuBtn" aria-label="Abrir menu de seções" aria-expanded="false" aria-controls="drawer" title="Menu"><svg viewBox="0 0 64 64" aria-hidden="true" class="mix"><rect x="4" y="8" width="56" height="48" rx="9" fill="#2D70B3"/><rect x="10" y="14" width="44" height="14" rx="3" fill="#fff"/><path d="M13 21Q17.5 15 22 21T31 21T40 21T49 21" stroke="#2D70B3" stroke-width="2.6" fill="none" stroke-linecap="round"/><g stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M15 33v17M25 33v17M35 33v17"/></g><g fill="#F5A524"><rect x="11.5" y="42" width="7" height="5" rx="1.5"/><rect x="21.5" y="35" width="7" height="5" rx="1.5"/><rect x="31.5" y="39" width="7" height="5" rx="1.5"/></g><circle cx="48" cy="42" r="6.5" fill="#fff"/><path d="M48 42l3.2-3.6" stroke="#2D70B3" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <div class="ttl"><h1>Laboratório de Acústica</h1><span class="sec" id="secName">Timbres</span></div>
     </div>
+    <button class="compactbtn" id="compactBtn" aria-pressed="true" title="Mostra só o essencial de cada seção">Compacto</button>
     <div class="safety"><b>Atenção</b> Use fones ou volume moderado.</div>
   </header>
+  <div class="scrim" id="scrim"></div>
+  <nav class="drawer" id="drawer" aria-label="Seções do laboratório">
+    <div class="dhead"><svg viewBox="0 0 64 64" aria-hidden="true" class="mix"><rect x="4" y="8" width="56" height="48" rx="9" fill="#2D70B3"/><rect x="10" y="14" width="44" height="14" rx="3" fill="#fff"/><path d="M13 21Q17.5 15 22 21T31 21T40 21T49 21" stroke="#2D70B3" stroke-width="2.6" fill="none" stroke-linecap="round"/><g stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M15 33v17M25 33v17M35 33v17"/></g><g fill="#F5A524"><rect x="11.5" y="42" width="7" height="5" rx="1.5"/><rect x="21.5" y="35" width="7" height="5" rx="1.5"/><rect x="31.5" y="39" width="7" height="5" rx="1.5"/></g><circle cx="48" cy="42" r="6.5" fill="#fff"/><path d="M48 42l3.2-3.6" stroke="#2D70B3" stroke-width="2.2" stroke-linecap="round"/></svg><b>Laboratório de Acústica</b></div>
+    <div class="modes">
+        <button aria-current="page" data-mode="tb"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0 3.5-5 5-3"/></svg><span><b>Timbres</b><small>Monte sons somando senoides</small></span></button>
+        <button aria-current="false" data-mode="kb"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M7.5 5v9M12 5v9M16.5 5v9M7.5 14v5M12 14v5M16.5 14v5"/></svg><span><b>Teclado</b><small>Toque notas com vários instrumentos</small></span></button>
+        <button aria-current="false" data-mode="lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18M12 3v18M18 3v18"/><rect x="3.5" y="13" width="5" height="3.5" rx="1"/><rect x="9.5" y="6" width="5" height="3.5" rx="1"/><rect x="15.5" y="10" width="5" height="3.5" rx="1"/></svg><span><b>Equalizador</b><small>Filtre bandas e veja o espectro</small></span></button>
+        <button aria-current="false" data-mode="game"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></svg><span><b>SpectroGame</b><small>Descubra qual banda foi alterada</small></span></button>
+        <button aria-current="false" data-mode="cc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H11v17H5.5A1.5 1.5 0 0 0 4 21.5zM20 4.5A1.5 1.5 0 0 0 18.5 3H13v17h5.5a1.5 1.5 0 0 1 1.5 1.5z"/></svg><span><b>Conceitos</b><small>Documentação e referências</small></span></button>
+    </div>
+    <p class="dfoot"><b style="color:var(--warn)">Atenção</b> Use fones ou volume moderado.<br>Física IV · IFCE Baturité</p>
+  </nav>
 
   <div class="work" id="work">
     <!-- Visores -->
@@ -531,17 +592,19 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
     <div class="col" id="rightCol">
       <!-- Teclado -->
       <section class="panel pad kb" id="kbPanel" aria-label="Teclado">
+        <div class="field kbinst"><label class="label" for="instSel">Instrumento</label><select id="instSel"></select></div>
+        <div class="keys" id="keys"></div>
         <div class="kbctl">
-          <div class="field"><label class="label" for="instSel">Instrumento</label><select id="instSel"></select></div>
           <div class="field"><span class="label">Oitava</span><div class="oct"><button id="octDown" aria-label="Oitava abaixo">−</button><span id="octVal">4</span><button id="octUp" aria-label="Oitava acima">+</button></div></div>
           <div class="field"><label class="label" for="susSel">Sustentação</label><select id="susSel">
             <option value="0.3">Curta (0,3 s)</option><option value="1" selected>Média (1 s)</option><option value="3">Longa (3 s)</option><option value="hold">Enquanto pressionar</option>
           </select></div>
         </div>
-        <div class="keys" id="keys"></div>
         <div class="kbread" aria-live="polite"><span>Nota: <b id="kNote">—</b></span><span>f = <b id="kFreq">—</b></span><span>λ = <b id="kLam">—</b></span></div>
-        <p class="idesc" id="instDesc"></p>
-        <p class="hint" id="kbHint">Toque nas teclas ou use o teclado do computador: <kbd>A</kbd> a <kbd>J</kbd> (brancas), <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> (pretas), <kbd>Z</kbd>/<kbd>X</kbd> mudam a oitava.</p>
+        <details class="fold" id="kbHelp"><summary>Como tocar</summary><div class="fbody">
+          <p class="hint" id="kbHint">Toque nas teclas ou use o teclado do computador: <kbd>A</kbd> a <kbd>J</kbd> (brancas), <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> (pretas), <kbd>Z</kbd>/<kbd>X</kbd> mudam a oitava.</p>
+          <p class="idesc" id="instDesc"></p>
+        </div></details>
       </section>
 
       <!-- Tom ajustável -->
@@ -614,14 +677,14 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
           <div class="rowline"><button class="btn primary" id="gAgain">Jogar de novo</button><button class="btn" id="gNew">Novo jogo</button></div>
         </div>
 
-        <div class="about">
+        <details class="fold about" id="gHelp"><summary>Como jogar</summary><div class="fbody">
           <p>Uma faixa secreta do som é alterada. Cada jogador ouve, compara com o original e tenta descobrir qual faixa foi mexida.</p>
           <ol class="rules">
             <li>São 3 níveis: <b>Fácil</b> (+12 dB, 5 faixas), <b>Médio</b> (+9 dB, 8 faixas) e <b>Difícil</b> (corte de 12 dB, 8 faixas).</li>
             <li>Em cada nível, cada jogador faz <b>3 jogadas seguidas</b> e depois passa o fone ao próximo.</li>
             <li><b>3 pontos</b> para a faixa certa, <b>1 ponto</b> para a faixa vizinha, 0 para as demais.</li>
           </ol>
-        </div>
+        </div></details>
       </section>
     </div>
   </div>
@@ -630,58 +693,54 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
     <div class="tb-inner">
       <div class="tb-top">
         <div class="tb-bar">
-          <div class="tb-pick">
-            <label for="tbPreset">Timbre:</label>
-            <select id="tbPreset" aria-label="Timbre pronto"></select>
-          </div>
-          <button class="tb-btn pri" id="tbPlay" aria-pressed="false"><svg viewBox="0 0 16 16" id="tbPlayIco" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg><span id="tbPlayTxt">Tocar</span></button>
-          <button class="tb-btn sec" id="tbToKb" title="Leva este timbre para a aba Teclado">Tocar no Teclado</button>
-        </div>
-        <p class="tb-desc" id="tbDesc"></p>
-        <p class="tb-formula" id="tbFormula"></p>
-        <div class="tb-plots">
-          <div class="tb-plotwrap">
-            <span class="cap">Forma de onda · soma das componentes</span>
-            <div class="tb-plot big" id="tbMainBox">
-              <canvas id="tbMain" aria-label="Gráfico da onda resultante"></canvas>
-              <div class="tb-zoom">
-                <button id="tbZin" title="Aproximar (menos tempo na tela)" aria-label="Aproximar">+</button>
-                <button id="tbZout" title="Afastar (mais tempo na tela)" aria-label="Afastar">−</button>
-                <button id="tbZhome" title="Janela automática" aria-label="Janela automática"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></button>
-              </div>
+          <label class="tb-lbl" for="tbPreset">Timbre:</label>
+          <select id="tbPreset" aria-label="Timbre pronto"></select>
+          <button class="tb-round pri" id="tbPlay" aria-label="Tocar" aria-pressed="false"><svg viewBox="0 0 16 16" id="tbPlayIco" aria-hidden="true"><path d="M4.5 2.5v11l9-5.5z"/></svg></button>
+          <div class="tb-filewrap">
+            <button class="tb-round sec" id="tbFileBtn" aria-label="Arquivo: colar picos, abrir ou salvar timbre" title="Arquivo" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3h11L21 7.5v12a1.5 1.5 0 0 1-1.5 1.5h-14A1.5 1.5 0 0 1 4 19.5z"/><path d="M8 3v5h7V3"/><rect x="7.5" y="13" width="9" height="8" rx="1"/></svg></button>
+            <div class="tb-menu" id="tbMenu" role="menu" hidden>
+              <button role="menuitem" id="tbPasteBtn">Colar picos do Friture</button>
+              <button role="menuitem" id="tbOpenBtn">Abrir timbre…</button>
+              <button role="menuitem" id="tbSaveBtn">Salvar timbre</button>
             </div>
           </div>
+          <input type="file" id="tbFile" accept=".json,.txt,.csv,application/json,text/plain" hidden>
+        </div>
+        <p class="tb-desc" id="tbDesc"></p>
+        <details class="fold" id="tbFx"><summary>Ver a função y(t)</summary><p class="tb-formula" id="tbFormula"></p></details>
+        <div class="tb-plots">
           <div class="tb-plotwrap">
-            <span class="cap" id="tbSpecCap">Espectro · uma linha por componente</span>
-            <div class="tb-plot big"><canvas id="tbSpec" aria-label="Espectro das componentes"></canvas></div>
+            <span class="cap">Forma de onda · soma das senoides</span>
+            <div class="tb-plot big" id="tbMainBox"><canvas id="tbMain" aria-label="Gráfico da onda resultante"></canvas></div>
+          </div>
+          <div class="tb-plotwrap">
+            <span class="cap" id="tbSpecCap">Espectro · uma linha por senoide</span>
+            <div class="tb-plot big"><canvas id="tbSpec" aria-label="Espectro das senoides"></canvas></div>
           </div>
         </div>
         <p class="tb-info" id="tbInfo"></p>
       </div>
 
-      <div class="tb-tools">
-        <div class="grp"><span class="lbl">Amplitude em</span>
-          <div class="tb-seg" id="tbUnit"><button data-u="lin" aria-pressed="true">linear (0 a 1)</button><button data-u="db" aria-pressed="false">dB</button></div>
-        </div>
-        <div class="grp">
-          <button class="tb-small" id="tbPasteBtn">Colar picos do Friture</button>
-          <button class="tb-small" id="tbOpenBtn">Abrir timbre…</button>
-          <button class="tb-small" id="tbSaveBtn">Salvar timbre</button>
-          <button class="tb-small" id="tbClearBtn">Limpar lista</button>
-          <input type="file" id="tbFile" accept=".json,.txt,.csv,application/json,text/plain" hidden>
-        </div>
-      </div>
+      <div class="tb-unit" id="tbUnit" role="group" aria-label="Escala de amplitude"><button data-u="lin" aria-pressed="true">Linear (0 a 1)</button><button data-u="db" aria-pressed="false">Logarítmico (dB)</button></div>
+
       <div class="tb-paste" id="tbPaste" hidden>
         <label for="tbPasteTxt"><b>Cole aqui os picos</b>, um por linha: frequência e nível (por exemplo, <code>220 -12</code> ou <code>440; 0,5</code>).</label>
         <textarea id="tbPasteTxt" spellcheck="false" placeholder="220   -6&#10;440   -12&#10;660   -20"></textarea>
         <p>Níveis negativos são lidos como dB (o mais forte vira amplitude 1). Valores entre 0 e 1 são lidos como amplitude linear. A lista atual é substituída.</p>
-        <div class="row"><button class="tb-btn pri" id="tbPasteGo">Montar timbre</button><button class="tb-small" id="tbPasteCancel">Cancelar</button><span class="tb-meta" id="tbPasteMsg"></span></div>
+        <div class="row"><button class="go" id="tbPasteGo">Montar timbre</button><button class="tb-small" id="tbPasteCancel">Cancelar</button><span class="tb-meta" id="tbPasteMsg"></span></div>
       </div>
 
-      <main class="tb-list" id="tbList" aria-label="Componentes do timbre"></main>
+      <div class="tb-lhead">
+        <b>Senoides <span id="tbCount"></span></b>
+        <button class="tb-small" id="tbEqualize" title="Coloca todos os gráficos na mesma escala do gráfico da soma">Igualar escalas</button>
+        <button class="tb-small" id="tbClearBtn">Limpar</button>
+      </div>
+      <div class="tb-toast" id="tbToast" hidden role="status"><span id="tbToastTxt">Lista limpa.</span><button id="tbUndo">Desfazer</button></div>
+
+      <main class="tb-list" id="tbList" aria-label="Senoides do timbre"></main>
 
       <div class="tb-addwrap">
-        <button class="tb-add" id="tbAddBtn">+ Adicionar componente</button>
+        <button class="tb-add" id="tbAddBtn">+ Adicionar senoide</button>
         <form class="tb-addform" id="tbAddForm" hidden>
           <label for="tbNewF">Frequência (Hz)<input id="tbNewF" type="number" min="20" max="20000" step="1" required></label>
           <label for="tbNewA"><span id="tbNewALbl">Amplitude (0 a 1)</span><input id="tbNewA" type="number" step="0.05" required></label>
@@ -692,7 +751,6 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
       </div>
     </div>
   </div>
-
   <div class="cc-page" id="ccPage" hidden>
     <div class="cc-inner doc">
       <nav class="doc-toc" aria-label="Sumário">
@@ -715,18 +773,19 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
         <section class="dsec" id="d-uso">
           <h2>Como usar</h2>
           <p class="lead">O Laboratório de Acústica gera sons no próprio navegador. Você monta timbres somando senos, toca notas, altera o volume de cada faixa de frequência e vê, ao mesmo tempo, o espectro e a forma de onda do resultado. Não precisa instalar nada nem fazer login.</p>
+          <p>As seções ficam no menu lateral: toque no ícone da mesa de som, no canto superior esquerdo, e escolha uma. No celular e no tablet, o botão <b>Compacto</b> mostra só o essencial de cada seção (desligue-o para ver todos os detalhes).</p>
           <div class="dgrid">
-            <div class="dcard"><h3>Timbres</h3><p>Monte um som somando senos: cada componente tem frequência, amplitude e fase. Comece por um dos timbres prontos (instrumentos, vozes, sinos, fenômenos) e veja como ele é construído. Também aceita picos copiados do Friture.</p></div>
+            <div class="dcard"><h3>Timbres</h3><p>Monte um som somando senoides: cada senoide tem frequência, amplitude e fase. Comece por um dos timbres prontos (instrumentos, vozes, sinos, fenômenos) e veja como ele é construído. Também aceita picos copiados do Friture.</p></div>
             <div class="dcard"><h3>Equalizador</h3><p>Escolha uma amostra no seletor <b>Amostra</b> e clique em <b>Tocar</b>. No painel da direita, escolha um preset ou arraste as dez barras. O botão <b>Equalizador ligado/desligado</b> compara o som alterado com o original.</p></div>
-            <div class="dcard"><h3>Teclado</h3><p>Toque notas com vários timbres, inclusive o tom puro e o timbre que você montou na aba Timbres (botão <b>Tocar no Teclado</b>). O som passa pelo mesmo equalizador e pelos mesmos gráficos, o que permite comparar instrumentos tocando a mesma nota.</p></div>
+            <div class="dcard"><h3>Teclado</h3><p>Toque notas com vários instrumentos, inclusive o tom puro (uma senoide só). O som passa pelo mesmo equalizador e pelos mesmos gráficos, o que permite comparar instrumentos tocando a mesma nota.</p></div>
             <div class="dcard"><h3>SpectroGame</h3><p>Jogo de ouvido para 1 a 4 pessoas: uma faixa secreta é alterada e cada jogador tenta descobrir qual foi. Treina a percepção de frequências.</p></div>
             <div class="dcard"><h3>Conceitos</h3><p>Esta página: a teoria por trás da ferramenta, o que é cada amostra e como cada recurso funciona.</p></div>
           </div>
           <h3 class="dh3">Atalhos do teclado do computador</h3>
           <table class="ref">
             <tbody>
-              <tr><td><kbd>Espaço</kbd></td><td>Tocar ou parar o som (abas Timbres, Equalizador e SpectroGame).</td></tr>
-              <tr><td><kbd>E</kbd></td><td>Ligar ou desligar o equalizador (aba Equalizador).</td></tr>
+              <tr><td><kbd>Espaço</kbd></td><td>Tocar ou parar o som (seções Timbres, Equalizador e SpectroGame).</td></tr>
+              <tr><td><kbd>E</kbd></td><td>Ligar ou desligar o equalizador (seção Equalizador).</td></tr>
               <tr><td><kbd>A</kbd> a <kbd>J</kbd></td><td>Teclas brancas do teclado musical, de Dó a Si.</td></tr>
               <tr><td><kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd></td><td>Teclas pretas (sustenidos).</td></tr>
               <tr><td><kbd>Z</kbd> / <kbd>X</kbd></td><td>Descer ou subir uma oitava.</td></tr>
@@ -737,20 +796,21 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
 
         <section class="dsec" id="d-timbres">
           <h2>Timbres e Friture</h2>
-          <p class="lead">Pelo teorema de Fourier, qualquer som periódico é uma soma de senos. Na aba Timbres você faz o caminho de volta: escolhe as frequências, as amplitudes e as fases e ouve o resultado.</p>
+          <p class="lead">Pelo teorema de Fourier, qualquer som periódico é uma soma de senos. Na seção Timbres você faz o caminho de volta: escolhe as frequências, as amplitudes e as fases e ouve o resultado.</p>
           <ul>
             <li><b>Timbres prontos</b>: receitas de harmônicos de instrumentos, vozes, sinos e fenômenos acústicos, com valores aproximados para fins didáticos. Um instrumento real muda o timbre com a nota, com a intensidade e ao longo do tempo; aqui o timbre fica parado.</li>
-            <li><b>Componentes</b>: cada uma é um termo A·sen(2π·f·t + φ). Os botões − e + mudam o valor; segurando, ele muda continuamente. A caixa <b>ligada</b> tira a componente da soma sem apagá-la.</li>
+            <li><b>Senoides</b>: cada uma é um termo A·sen(2π·f·t + φ). Os botões − e + mudam o valor; segurando, ele muda continuamente. A caixa <b>ligada</b> tira a senoide da soma sem apagá-la. Quando a frequência é múltipla inteira da mais grave, a senoide recebe a etiqueta <i>fundamental</i> ou <i>2º harmônico</i>, <i>3º harmônico</i> etc. A função y(t) completa fica no painel <b>Ver a função y(t)</b>.</li>
             <li><b>Fase</b>: não muda o que se ouve num som contínuo, mas muda a forma de onda. Na onda triangular, as fases de 180° nos harmônicos 3, 7 e 11 são o que faz a soma ficar triangular.</li>
-            <li><b>Gráficos</b>: à esquerda, a soma ao longo do tempo (passe o mouse para ler os valores); à direita, o espectro, com uma linha por componente na cor dela. Use + e − para mudar a escala de tempo.</li>
+            <li><b>Gráficos</b>: no topo, a soma ao longo do tempo (passe o mouse para ler os valores) e o espectro, com uma linha por senoide na cor dela. Cada senoide tem também o seu gráfico.</li>
+            <li><b>Escalas</b>: as escalas não mudam sozinhas enquanto você edita, para que as comparações sejam justas. Em cada gráfico, <b>↔ − +</b> afasta ou aproxima o eixo do tempo e <b>↕ − +</b> o eixo da amplitude; o botão da casinha ajusta o gráfico à curva. <b>Igualar escalas</b>, no topo da lista, põe todos os gráficos das senoides na mesma escala do gráfico da soma.</li>
             <li><b>Amplitude linear ou em dB</b>: em dB, 0 dB é a amplitude 1, −6 dB é a metade e −20 dB é um décimo.</li>
-            <li><b>Tocar no Teclado</b>: leva o timbre para a aba Teclado, que mantém as proporções entre as frequências e muda só a nota.</li>
+            <li><b>Arquivo</b> (ícone do disquete, ao lado do botão tocar): colar picos do Friture, abrir um timbre salvo ou salvar o timbre atual num arquivo .json. <b>Limpar</b> apaga a lista; logo depois aparece <b>Desfazer</b>.</li>
           </ul>
           <h3 class="dh3">Reconstruindo um som real com o Friture</h3>
           <ul>
             <li>No <a href="https://friture.org" target="_blank" rel="noopener">Friture</a>, abra o espectro, toque o som (instrumento, voz, diapasão) perto do microfone e congele a tela.</li>
             <li>Anote a frequência e o nível em dB de cada pico, do mais grave ao mais agudo.</li>
-            <li>Na aba Timbres, clique em <b>Colar picos do Friture</b> e escreva uma linha por pico, por exemplo <code>220 -6</code>. O pico mais forte vira amplitude 1 e os outros ficam proporcionais.</li>
+            <li>Na seção Timbres, abra o menu do disquete, clique em <b>Colar picos do Friture</b> e escreva uma linha por pico, por exemplo <code>220 -6</code>. O pico mais forte vira amplitude 1 e os outros ficam proporcionais.</li>
             <li>Compare, de ouvido e nos gráficos, o som original e a reconstrução. Use <b>Salvar timbre</b> para guardar o resultado num arquivo e <b>Abrir timbre</b> para continuar depois.</li>
           </ul>
         </section>
@@ -762,7 +822,7 @@ body.m-game #sampleSel, body.m-game .tlab{display:none}
             <div class="concept"><h3>Frequência e altura</h3><p>Frequência é o número de oscilações por segundo, medida em hertz (Hz). Quanto maior a frequência, mais agudo o som. O ouvido humano jovem percebe de cerca de 20 Hz a 20 000 Hz; com a idade, o limite superior cai.</p><span class="f">v = λ · f &nbsp;→&nbsp; λ = 343 / f</span></div>
             <div class="concept"><h3>Período</h3><p>Período é o tempo de uma oscilação completa. É o inverso da frequência: um Lá de 440 Hz repete seu ciclo a cada 2,27 ms. Na forma de onda, é a distância entre dois ciclos iguais.</p><span class="f">T = 1 / f</span></div>
             <div class="concept"><h3>Amplitude e intensidade</h3><p>A amplitude da onda se relaciona com a intensidade do som. O nível sonoro é medido em decibéis, uma escala logarítmica: +10 dB significam 10 vezes mais intensidade; +6 dB, cerca do dobro da amplitude; +12 dB, cerca de 16 vezes a intensidade.</p><span class="f">β = 10 · log(I / I₀)</span></div>
-            <div class="concept"><h3>Timbre e harmônicos</h3><p>Um som musical é a soma de uma frequência fundamental com harmônicos (múltiplos inteiros dela). A proporção entre os harmônicos define o timbre: é por isso que violão e flauta tocando a mesma nota soam diferentes. Experimente na aba Teclado.</p><span class="f">fₙ = n · f₁</span></div>
+            <div class="concept"><h3>Timbre e harmônicos</h3><p>Um som musical é a soma de uma frequência fundamental com harmônicos (múltiplos inteiros dela). A proporção entre os harmônicos define o timbre: é por isso que violão e flauta tocando a mesma nota soam diferentes. Experimente nas seções Timbres e Teclado.</p><span class="f">fₙ = n · f₁</span></div>
             <div class="concept"><h3>Notas e oitavas</h3><p>Cada oitava dobra a frequência. Entre duas teclas vizinhas do teclado (um semitom), a frequência é multiplicada pela raiz duodécima de 2, cerca de 1,0595. Doze semitons formam uma oitava. A referência é o Lá4 = 440 Hz.</p><span class="f">f = 440 · 2^(n/12)</span></div>
             <div class="concept"><h3>Espectro</h3><p>Qualquer som pode ser decomposto numa soma de senoides (teorema de Fourier). O espectro mostra quanta energia existe em cada frequência num instante. O eixo horizontal é logarítmico: cada divisão dobra a frequência (uma oitava), como o ouvido percebe.</p></div>
             <div class="concept"><h3>Forma de onda</h3><p>Mostra como a pressão do ar (a amplitude) varia com o tempo, como num osciloscópio. Um tom puro é uma senoide; instrumentos diferentes tocando a mesma nota têm o mesmo período, mas formas diferentes: é o timbre visto no tempo.</p></div>
@@ -1352,7 +1412,7 @@ $('toneWave').addEventListener('click', e => {
 /* ---------- Transporte ---------- */
 function renderTransport() {
   $('playTxt').textContent = state.playing ? 'Pausar' : 'Tocar';
-  $('playBtn').setAttribute('aria-label', state.playing ? 'Pausar' : 'Tocar');
+  $('playBtn').setAttribute('aria-label', state.playing ? 'Pausar' : 'Tocar'); $('playBtn').title = state.playing ? 'Pausar (espaço)' : 'Tocar (espaço)';
   $('playIco').innerHTML = state.playing ? '<path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/>' : '<path d="M4 2.5v11l9-5.5z"/>';
 }
 $('playBtn').onclick = () => state.playing ? pause() : play();
@@ -1446,8 +1506,9 @@ $('resetBtn').onclick = () => applyPreset('neutro');
 function setMode(m) {
   const prev = state.mode;
   state.mode = m; W.mark = null;
-  document.body.className = 'm-' + m;
-  document.querySelectorAll('.modes button').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m));
+  ['tb', 'kb', 'lab', 'game', 'cc'].forEach(x => document.body.classList.toggle('m-' + x, x === m));
+  document.querySelectorAll('.modes button').forEach(b => b.setAttribute('aria-current', b.dataset.mode === m ? 'page' : 'false'));
+  const mb = document.querySelector(`.modes button[data-mode="${m}"] b`); if (mb) { $('secName').textContent = mb.textContent; document.title = mb.textContent + ' · Laboratório de Acústica'; }
   $('work').hidden = m === 'cc' || m === 'tb'; $('ccPage').hidden = m !== 'cc'; $('tbPage').hidden = m !== 'tb';
   if (prev === 'tb' && m !== 'tb') TB.stop();
   if (m === 'tb') { pause(); requestAnimationFrame(() => TB.drawAll()); }
@@ -1460,7 +1521,27 @@ function setMode(m) {
   setMystery(); applyAll();
   requestAnimationFrame(resize);
 }
-document.querySelector('.modes').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setMode(b.dataset.mode); });
+function navOpen(on) {
+  document.body.classList.toggle('nav-open', on); $('menuBtn').setAttribute('aria-expanded', on);
+  if (on) (document.querySelector('.modes button[aria-current="page"]') || document.querySelector('.modes button')).focus();
+}
+$('menuBtn').addEventListener('click', () => navOpen(!document.body.classList.contains('nav-open')));
+$('scrim').addEventListener('click', () => { navOpen(false); $('menuBtn').focus(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('nav-open')) { e.stopPropagation(); navOpen(false); $('menuBtn').focus(); } }, true);
+document.querySelector('.modes').addEventListener('click', e => {
+  const b = e.target.closest('button[data-mode]'); if (!b) return;
+  navOpen(false); if (b.dataset.mode !== state.mode) setMode(b.dataset.mode); $('menuBtn').focus();
+});
+/* Modo compacto (só celular e tablet) */
+const smallMQ = window.matchMedia('(max-width:1180px), (max-height:620px)');
+let compactPref = true; try { const v = localStorage.getItem('acus-compact'); if (v !== null) compactPref = v === '1'; } catch (e) {}
+function applyCompact() {
+  document.body.classList.toggle('compact', compactPref && smallMQ.matches);
+  $('compactBtn').setAttribute('aria-pressed', compactPref);
+  requestAnimationFrame(() => { resize(); TB.drawAll(); });
+}
+$('compactBtn').addEventListener('click', () => { compactPref = !compactPref; try { localStorage.setItem('acus-compact', compactPref ? '1' : '0'); } catch (e) {} applyCompact(); });
+smallMQ.addEventListener?.('change', applyCompact);
 
 /* ---------- SpectroGame ---------- */
 const LEVELS = [
@@ -1594,7 +1675,6 @@ $('gNew').onclick = () => { G.phase = 'setup'; G.players = []; G.target = null; 
 
 /* ---------- Teclado ---------- */
 const INSTR = [
-  { id: 'meu', n: 'Meu timbre (aba Timbres)', att: .01, dec: 0, sus: 1, rel: .1, get d() { const r = (typeof TB !== 'undefined') ? TB.recipe() : []; return r.length ? `<b>Meu timbre:</b> ${TB.name()}, com ${r.length} componente(s) montada(s) na aba Timbres. O teclado mantém as proporções entre as frequências e muda só a nota.` : '<b>Meu timbre:</b> ainda vazio. Monte um timbre na aba Timbres.'; } },
   { id: 'puro', n: 'Tom puro (senoide)', h: [1], att: .01, dec: 0, sus: 1, rel: .05, d: '<b>Tom puro:</b> uma única frequência, sem harmônicos. No espectro aparece um só pico e a forma de onda é uma senoide. Compare com os instrumentos.' },
   { id: 'piano', n: 'Piano', h: [1, .7, .45, .35, .25, .18, .12, .09, .06, .05, .03, .02], att: .005, dec: .9, sus: 0, rel: .25, d: '<b>Piano:</b> ataque rápido e som que decai sozinho. Muitos harmônicos, que somem mais depressa que a fundamental.' },
   { id: 'orgao', n: 'Órgão', h: { 1: 1, 2: .8, 3: .5, 4: .6, 6: .3, 8: .35 }, att: .01, dec: 0, sus: 1, rel: .06, d: '<b>Órgão:</b> soma de tubos em oitavas (harmônicos 1, 2, 4, 8) e quintas (3, 6). O som não decai.' },
@@ -1658,14 +1738,7 @@ async function noteOn(k, id) {
   const env = ctx.createGain(); env.gain.value = 0; env.connect(N.kbBus);
   const oscs = [];
   const peak = 0.28;
-  if (inst.id === 'meu') {
-    const rec = TB.recipe().filter(c => c.A > 0), base = rec.length ? Math.min(...rec.map(c => c.f)) : 1, S = rec.reduce((a, c) => a + c.A, 0) || 1;
-    (rec.length ? rec : [{ f: 1, A: 1 }]).forEach(c => {
-      const r = c.f / base; if (f * r > SR / 2 - 500) return;
-      const o = ctx.createOscillator(); o.frequency.value = f * r;
-      const g = ctx.createGain(); g.gain.value = c.A / Math.max(1, S) * 1.2; o.connect(g); g.connect(env); oscs.push(o);
-    });
-  } else if (inst.part) {
+  if (inst.part) {
     inst.part.forEach(([r, a, ]) => {
       if (f * r > SR / 2 - 500) return;
       const o = ctx.createOscillator(); o.frequency.value = f * r;
@@ -1723,7 +1796,7 @@ function renderInst() { $('instDesc').innerHTML = INSTR.find(x => x.id === KB.in
 
 /* ---------- Teclas do computador ---------- */
 document.addEventListener('keydown', e => {
-  const tg = e.target;
+  const tg = e.target; if (document.body.classList.contains('nav-open')) return;
   if (tg.matches('input[type=text], input:not([type]), textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
   if (state.mode === 'kb') {
     const key = e.key.toLowerCase();
@@ -2007,6 +2080,7 @@ function loop(t) {
 }
 
 
+
 /* ===================== Aba Timbres ===================== */
 const TB = (() => {
 const COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6'];
@@ -2024,9 +2098,9 @@ const norm = list => { const m = Math.max(...list.map(c => c[1])); return list.m
 function voice(f0, formants, fmax, maxN) {
   const out = [];
   for (let n = 1; n * f0 <= fmax && n <= 40; n++) {
-    const f = n * f0; let h = 0.25;
-    for (const [F, B, A] of formants) h += 2.5 * A / (1 + ((f - F) / B) ** 2);
-    out.push([+f.toFixed(2), h / Math.pow(n, 0.8)]);
+    const f = n * f0; let h = 0.01;
+    for (const [F, B, A] of formants) h += A / (1 + ((f - F) / B) ** 2);
+    out.push([+f.toFixed(2), h / Math.pow(n, 0.35)]);
   }
   return norm(out).filter(c => c[1] >= 0.05).slice(0, maxN || 16);
 }
@@ -2061,7 +2135,7 @@ const PRESETS = [
   { g: 'Percussão afinada', id: 'sino', n: 'Sino de igreja', d: 'Parciais em 0,5; 1; 1,2; 1,5; 2; 2,5 e 3 × a nota nominal: o 1,2 (terça menor) dá o caráter melancólico.', c: [[131, 0.5, 0], [262, 0.7, 0], [314.4, 0.6, 0], [393, 0.35, 0], [524, 1, 0], [655, 0.3, 0], [786, 0.25, 0]] },
   { g: 'Percussão afinada', id: 'tubular', n: 'Sino tubular', d: 'Tubo vibrando livre: parciais em 1; 2,76; 5,4 e 8,93 × f, que não são múltiplos inteiros.', c: [[262, 1, 0], [723.1, 0.6, 0], [1414.8, 0.4, 0], [2339.7, 0.25, 0]] },
   { g: 'Fenômenos', id: 'batimento', n: 'Batimento (440 e 443 Hz)', d: 'Duas frequências muito próximas: o volume sobe e desce 3 vezes por segundo. Use − no gráfico para ver.', c: [[440, 1, 0], [443, 1, 0]] },
-  { g: 'Fenômenos', id: 'ausente', n: 'Fundamental ausente (200 Hz)', d: 'Só 600, 800 e 1 000 Hz. Nenhuma componente tem 200 Hz, mas a soma repete a cada 5 ms e o ouvido percebe essa nota.', c: [[600, 1, 0], [800, 1, 0], [1000, 1, 0]] },
+  { g: 'Fenômenos', id: 'ausente', n: 'Fundamental ausente (200 Hz)', d: 'Só 600, 800 e 1 000 Hz. Nenhuma senoide tem 200 Hz, mas a soma repete a cada 5 ms e o ouvido percebe essa nota.', c: [[600, 1, 0], [800, 1, 0], [1000, 1, 0]] },
   { g: 'Fenômenos', id: 'dtmf', n: 'Tecla 5 do telefone (770 + 1 336 Hz)', d: 'Os telefones de tons codificam cada tecla com duas frequências somadas (sistema DTMF).', c: [[770, 1, 0], [1336, 1, 0]] },
   { g: 'Fenômenos', id: 'acorde', n: 'Acorde de Dó maior (4 : 5 : 6)', d: 'Três notas em afinação justa: 264, 330 e 396 Hz. A soma repete a cada 1/66 s.', c: [[264, 1, 0], [330, 1, 0], [396, 1, 0]] },
   { g: 'Fenômenos', id: 'quinta', n: 'Quinta justa (220 + 330 Hz)', d: 'Razão 3 : 2. A soma repete com 110 Hz, uma oitava abaixo da nota mais grave.', c: [[220, 1, 0], [330, 1, 0]] },
@@ -2069,7 +2143,8 @@ const PRESETS = [
 ];
 
 /* ---------- Estado ---------- */
-let comps = [], nextId = 1, colorIdx = 0, zoom = 0, hoverX = null, unit = 'lin', presetId = 'seno';
+let comps = [], nextId = 1, colorIdx = 0, hoverX = null, unit = 'lin', presetId = 'seno', undoList = null, toastT = 0;
+let mainV = { T: 0.01, Y: 1 };
 const active = () => comps.filter(c => c.on && c.A > 0);
 const sumAt = (list, t) => { let s = 0; for (const c of list) s += c.A * Math.sin(2 * Math.PI * c.f * t + (c.ph || 0) * Math.PI / 180); return s; };
 function gcd(a, b) { while (b) { [a, b] = [b, a % b]; } return a; }
@@ -2081,8 +2156,25 @@ function autoWindow() {
   const f0 = commonF(list), fmin = Math.min(...list.map(c => c.f));
   return clamp(3 / (f0 >= 20 ? f0 : fmin), 0.0005, 0.1);
 }
-const windowS = () => clamp(autoWindow() * Math.pow(2, zoom), 0.0002, 2);
-const yMaxFor = S => [0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 15, 20].find(v => v >= S - 1e-9) || Math.ceil(S);
+const YS = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 50];
+const yMaxFor = S => YS.find(v => v >= S - 1e-9) || Math.ceil(S);
+const T_MIN = 0.0002, T_MAX = 2;
+function fitMain() { const S = active().reduce((a, c) => a + c.A, 0); mainV = { T: autoWindow(), Y: yMaxFor(Math.max(S, 0.25)) }; }
+function equalize() { comps.forEach(c => { c.v = { ...mainV }; }); }
+function fitComp(c) { c.v = { T: clamp(3 / c.f, T_MIN, T_MAX), Y: yMaxFor(Math.max(c.A, 0.05)) }; }
+function zoomView(v, axis, dir) {
+  if (axis === 't') v.T = clamp(dir > 0 ? v.T / 2 : v.T * 2, T_MIN, T_MAX);
+  else { let i = YS.findIndex(x => x >= v.Y - 1e-9); if (i < 0) i = YS.length - 1; v.Y = YS[clamp(i - dir, 0, YS.length - 1)]; }
+}
+const ZSVG = '<svg viewBox="0 0 16 16"><path d="M2.5 8 8 3l5.5 5M4.5 6.5V13h7V6.5"/></svg>';
+function zoomCtl(box, getV, fitFn, after, name) {
+  const z = document.createElement('div'); z.className = 'tb-zoom';
+  const mk = (txt, lab, fn) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = txt; b.setAttribute('aria-label', lab); b.title = lab; b.addEventListener('click', e => { e.stopPropagation(); fn(); after(); }); return b; };
+  const grp = (sym, axis, lab) => { const g = document.createElement('span'); g.className = 'zg'; const i = document.createElement('i'); i.textContent = sym; i.setAttribute('aria-hidden', 'true');
+    g.append(i, mk('−', `Afastar ${lab} (${name})`, () => zoomView(getV(), axis, -1)), mk('+', `Aproximar ${lab} (${name})`, () => zoomView(getV(), axis, 1))); return g; };
+  const home = mk(ZSVG, `Ajustar à curva (${name})`, fitFn); home.className = 'zh';
+  z.append(grp('↔', 't', 'tempo'), grp('↕', 'y', 'amplitude'), home); box.appendChild(z); return z;
+}
 
 /* ---------- Desenho ---------- */
 const tok = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -2096,9 +2188,9 @@ function fit(cv) {
 const minorOf = s => s / (Math.round(s / Math.pow(10, Math.floor(Math.log10(s)))) === 2 ? 4 : 5);
 const decOf = s => Math.max(0, -Math.floor(Math.log10(s) + 1e-9));
 function halo(g, txt, x, y) { g.strokeText(txt, x, y); g.fillText(txt, x, y); }
-function plotWave(cv, curves, ymaxNice, opts = {}) {
+function plotWave(cv, curves, view, opts = {}) {
   const { g, w, h } = fit(cv); if (w < 2 || h < 2) return null;
-  const T = windowS(), t0 = -0.035 * T, t1 = T, ymax = ymaxNice * 1.12;
+  const ymaxNice = view.Y, T = view.T, t0 = -0.035 * T, t1 = T, ymax = ymaxNice * 1.12;
   const X = t => (t - t0) / (t1 - t0) * w, Y = v => h / 2 - v / ymax * (h / 2);
   const col = { bg: tok('--plot-bg'), minor: tok('--grid-minor'), major: tok('--grid-major'), axis: tok('--axis'), label: tok('--plot-label'), halo: tok('--halo') };
   g.fillStyle = col.bg; g.fillRect(0, 0, w, h);
@@ -2156,8 +2248,8 @@ function plotSpec() {
   g.textAlign = 'right'; g.textBaseline = 'bottom'; halo(g, 'Hz', w - padR - 2, h - padB - 3);
 }
 function drawMain() {
-  const list = active(), S = list.reduce((a, c) => a + c.A, 0);
-  const geo = plotWave($('tbMain'), [{ list, color: tok('--ink'), width: 2.6 }], yMaxFor(Math.max(S, 0.25)), { pad: true });
+  const list = active();
+  const geo = plotWave($('tbMain'), [{ list, color: tok('--ink'), width: 2.6 }], mainV, { pad: true });
   if (!geo || hoverX === null || !list.length) return;
   const { X, Y, t0, t1, w, h } = geo, t = t0 + (hoverX / w) * (t1 - t0); if (t < 0) return;
   const y = sumAt(list, t), g = $('tbMain').getContext('2d');
@@ -2168,7 +2260,7 @@ function drawMain() {
   g.fillStyle = tok('--panel'); g.strokeStyle = tok('--line'); g.lineWidth = 1; g.beginPath(); g.roundRect ? g.roundRect(lx, ly, tw, 22, 5) : g.rect(lx, ly, tw, 22); g.fill(); g.stroke();
   g.fillStyle = tok('--ink'); g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillText(label, lx + 7, ly + 11);
 }
-function drawMini(c) { const el = document.querySelector(`.tb-comp[data-id="${c.id}"] canvas`); if (el) plotWave(el, [{ list: [c], color: tok(c.color), width: 2.3 }], 1); }
+function drawMini(c) { const el = document.querySelector(`.tb-comp[data-id="${c.id}"] canvas`); if (el) plotWave(el, [{ list: [c], color: tok(c.color), width: 2.3 }], c.v || mainV); }
 function drawAll() { if (state.mode !== 'tb') return; drawMain(); plotSpec(); comps.forEach(drawMini); }
 
 /* ---------- Textos ---------- */
@@ -2180,15 +2272,15 @@ function renderFormula() {
 }
 function renderInfo() {
   const list = active(), el = $('tbInfo');
-  if (!list.length) { el.textContent = 'Adicione uma componente ou escolha um timbre pronto.'; return; }
-  const win = ` Na tela: ${fmt(windowS() * 1000, windowS() < 0.01 ? 2 : 1)} ms.`;
+  if (!list.length) { el.textContent = 'Adicione uma senoide ou escolha um timbre pronto.'; return; }
+  const win = ` Na tela: ${fmt(mainV.T * 1000, mainV.T < 0.01 ? 2 : 1)} ms.`;
   const f0 = commonF(list), fs = list.map(c => c.f).sort((a, b) => a - b);
   let minDiff = Infinity; for (let i = 1; i < fs.length; i++) minDiff = Math.min(minDiff, fs[i] - fs[i - 1]);
   if (list.length === 1) { const n = noteName(f0); el.innerHTML = `Tom puro: repete a cada <b>T = ${fmt(1000 / f0, 3)} ms</b>, f = <b>${fmtF(f0)} Hz</b>${n ? ' (≈ ' + n + ')' : ''}.` + win; return; }
-  if (minDiff > 0 && minDiff < 20) { el.innerHTML = `Duas componentes estão a <b>${fmtF(+minDiff.toFixed(2))} Hz</b> uma da outra: o volume sobe e desce ${fmtF(+minDiff.toFixed(2))} vez(es) por segundo (batimento). Use − para afastar e ver.` + win; return; }
+  if (minDiff > 0 && minDiff < 20) { el.innerHTML = `Duas senoides estão a <b>${fmtF(+minDiff.toFixed(2))} Hz</b> uma da outra: o volume sobe e desce ${fmtF(+minDiff.toFixed(2))} vez(es) por segundo (batimento). Use ↔ − para afastar e ver.` + win; return; }
   if (f0 >= 20) {
     const n = noteName(f0), missing = !list.some(c => Math.abs(c.f - f0) < 0.005);
-    el.innerHTML = `A soma repete a cada <b>T = ${fmt(1000 / f0, 3)} ms</b>: a nota ouvida tem f = <b>${fmtF(f0)} Hz</b>${n ? ' (≈ ' + n + ')' : ''}.` + (missing ? ' Nenhuma componente tem essa frequência: é a <i>fundamental ausente</i>, que o ouvido reconstrói.' : '') + win; return;
+    el.innerHTML = `A soma repete a cada <b>T = ${fmt(1000 / f0, 3)} ms</b>: a nota ouvida tem f = <b>${fmtF(f0)} Hz</b>${n ? ' (≈ ' + n + ')' : ''}.` + (missing ? ' Nenhuma senoide tem essa frequência: é a <i>fundamental ausente</i>, que o ouvido reconstrói.' : '') + win; return;
   }
   const fmin = fs[0], dev = Math.max(...fs.map(f => Math.abs(f - Math.round(f / fmin) * fmin)));
   if (dev > 0 && dev <= 0.03 * fmin) { el.innerHTML = `As frequências são <b>quase</b> múltiplas de ${fmtF(fmin)} Hz (desvio de até <b>${fmtF(+dev.toFixed(2))} Hz</b>): a nota soa como ${fmtF(fmin)} Hz, mas a forma da onda vai mudando aos poucos.` + win; return; }
@@ -2199,7 +2291,15 @@ function renderMeta(c) {
   const n = noteName(c.f), base = Math.min(...comps.map(x => x.f)), r = c.f / base;
   const rTxt = Math.abs(r - Math.round(r)) < 0.005 ? `${Math.round(r)} × ${fmtF(base)} Hz` : `${fmt(r, 3)} × ${fmtF(base)} Hz`;
   el.textContent = `T = ${fmt(1000 / c.f, 3)} ms${n ? ' · ≈ ' + n : ''} · ${rTxt}`;
+  const tg = document.querySelector(`.tb-comp[data-id="${c.id}"] .tag`); if (tg) tg.textContent = tagOf(c);
 }
+function tagOf(c) {
+  if (!comps.length) return ''; const base = Math.min(...comps.map(x => x.f)), r = c.f / base, k = Math.round(r);
+  if (Math.abs(r - k) > 0.005 * k) return '';
+  if (k === 1) return comps.length > 1 ? 'fundamental' : '';
+  return `${k}º harmônico`;
+}
+function renderCount() { $('tbCount').textContent = `(${comps.length})`; $('tbEqualize').disabled = !comps.length; $('tbClearBtn').disabled = !comps.length; }
 function refresh() { renderFormula(); renderInfo(); comps.forEach(renderMeta); drawAll(); syncAudio(); }
 
 /* ---------- Lista ---------- */
@@ -2235,18 +2335,18 @@ function field(label, stepEl, unitTxt) {
 const ro = new ResizeObserver(() => { clearTimeout(ro._t); ro._t = setTimeout(drawAll, 30); });
 function renderList() {
   const box = $('tbList'); box.innerHTML = '';
-  if (!comps.length) { const e = document.createElement('div'); e.className = 'tb-empty'; e.textContent = 'Nenhuma componente. Escolha um timbre pronto, cole os picos do Friture ou clique em “Adicionar componente”.'; box.appendChild(e); return; }
+  if (!comps.length) { const e = document.createElement('div'); e.className = 'tb-empty'; e.textContent = 'Nenhuma senoide. Escolha um timbre pronto, cole os picos do Friture (menu do disquete) ou clique em “Adicionar senoide”.'; box.appendChild(e); renderCount(); return; }
   comps.forEach((c, i) => {
     const art = document.createElement('article'); art.className = 'tb-comp' + (c.on ? '' : ' off'); art.dataset.id = c.id; art.style.setProperty('--c', `var(${c.color})`);
     const ctl = document.createElement('div'); ctl.className = 'tb-ctl';
     const head = document.createElement('div'); head.className = 'tb-chead';
     const sw = document.createElement('span'); sw.className = 'tb-sw';
-    const ttl = document.createElement('b'); ttl.textContent = `Componente ${i + 1}`;
+    const ttl = document.createElement('span'); ttl.className = 'ttl'; const tn = document.createElement('b'); tn.textContent = `Senoide ${i + 1}`; const tt = document.createElement('span'); tt.className = 'tag'; tt.textContent = tagOf(c); ttl.append(tn, tt);
     const tg = document.createElement('label'); tg.className = 'tb-toggle';
     const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = c.on; cb.id = `tb${c.id}-on`;
     cb.addEventListener('change', () => { c.on = cb.checked; art.classList.toggle('off', !c.on); refresh(); });
     tg.append(cb, document.createTextNode('ligada'));
-    const del = document.createElement('button'); del.className = 'tb-del'; del.type = 'button'; del.setAttribute('aria-label', `Remover componente ${i + 1}`);
+    const del = document.createElement('button'); del.className = 'tb-del'; del.type = 'button'; del.setAttribute('aria-label', `Remover senoide ${i + 1}`);
     del.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg>';
     del.addEventListener('click', () => { comps = comps.filter(x => x !== c); markCustom(); renderList(); refresh(); });
     head.append(sw, ttl, tg, del);
@@ -2258,15 +2358,18 @@ function renderList() {
     const meta = document.createElement('p'); meta.className = 'tb-meta';
     ctl.append(head, fF, fA, fP, meta);
     const mini = document.createElement('div'); mini.className = 'tb-plot tb-mini';
-    const cv = document.createElement('canvas'); cv.setAttribute('aria-label', `Gráfico da componente ${i + 1}`); mini.appendChild(cv);
+    const cv = document.createElement('canvas'); cv.setAttribute('aria-label', `Gráfico da senoide ${i + 1}`); mini.appendChild(cv);
+    if (!c.v) c.v = { ...mainV };
+    zoomCtl(mini, () => c.v, () => fitComp(c), () => { drawMini(c); }, `senoide ${i + 1}`);
     art.append(ctl, mini); box.appendChild(art); ro.observe(cv);
   });
+  renderCount();
 }
 function setComps(list) {
   comps = list.map(([f, A, ph]) => ({ id: nextId++, f, A, ph: ph || 0, on: true, color: COLORS[(colorIdx++) % COLORS.length] }));
-  colorIdx = comps.length; zoom = 0; renderList(); refresh();
+  colorIdx = comps.length; fitMain(); equalize(); renderList(); refresh();
 }
-function addComp(f, A, ph = 0) { comps.push({ id: nextId++, f, A, ph, on: true, color: COLORS[(colorIdx++) % COLORS.length] }); markCustom(); renderList(); refresh(); }
+function addComp(f, A, ph = 0) { const wasEmpty = !comps.length; comps.push({ id: nextId++, f, A, ph, on: true, color: COLORS[(colorIdx++) % COLORS.length], v: null }); if (wasEmpty) fitMain(); comps[comps.length - 1].v = { ...mainV }; markCustom(); renderList(); refresh(); }
 
 /* ---------- Timbres prontos ---------- */
 function buildPresetSel() {
@@ -2294,11 +2397,11 @@ function markCustom() {
 $('tbUnit').addEventListener('click', e => {
   const b = e.target.closest('button[data-u]'); if (!b) return;
   unit = b.dataset.u; [...$('tbUnit').children].forEach(x => x.setAttribute('aria-pressed', x === b));
-  $('tbSpecCap').textContent = unit === 'db' ? 'Espectro · nível em dB (0 dB = amplitude 1)' : 'Espectro · uma linha por componente';
+  $('tbSpecCap').textContent = unit === 'db' ? 'Espectro · nível em dB (0 dB = amplitude 1)' : 'Espectro · uma linha por senoide';
   renderList(); refresh();
 });
 
-/* ---------- Nova componente ---------- */
+/* ---------- Nova senoide ---------- */
 function suggest() {
   if (!comps.length) return { f: 220, A: 1, why: 'Sugestão: um Lá de 220 Hz como fundamental.' };
   const base = Math.min(...comps.map(c => c.f)), used = new Set(comps.map(c => Math.round(c.f / base * 1000)));
@@ -2351,7 +2454,7 @@ $('tbPasteGo').addEventListener('click', () => {
 });
 $('tbSaveBtn').addEventListener('click', () => {
   const nome = presetId !== 'meu' ? (PRESETS.find(p => p.id === presetId)?.n || 'Meu timbre') : 'Meu timbre';
-  const data = { programa: 'Laboratório de Acústica', nome, componentes: comps.map(c => ({ frequencia_Hz: c.f, amplitude: c.A, fase_graus: c.ph || 0, ligada: c.on })) };
+  const data = { programa: 'Laboratório de Acústica', nome, senoides: comps.map(c => ({ frequencia_Hz: c.f, amplitude: c.A, fase_graus: c.ph || 0, ligada: c.on })) };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = (nome.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'timbre') + '.json';
@@ -2363,7 +2466,7 @@ $('tbFile').addEventListener('change', async () => {
   const txt = await file.text(); $('tbFile').value = '';
   try {
     const d = JSON.parse(txt);
-    const list = (d.componentes || []).map(c => [Number(c.frequencia_Hz), clamp(Number(c.amplitude), 0, 1), Number(c.fase_graus) || 0, c.ligada !== false]).filter(c => c[0] >= F_MIN && c[0] <= F_MAX);
+    const list = (d.senoides || d.componentes || []).map(c => [Number(c.frequencia_Hz), clamp(Number(c.amplitude), 0, 1), Number(c.fase_graus) || 0, c.ligada !== false]).filter(c => c[0] >= F_MIN && c[0] <= F_MAX);
     if (!list.length) throw new Error('vazio');
     setComps(list.map(c => [c[0], c[1], c[2]])); comps.forEach((c, i) => { c.on = list[i][3]; }); presetId = 'x'; markCustom();
     $('tbDesc').innerHTML = `<b>${(d.nome || 'Timbre').replace(/[<>&]/g, '')}</b> (aberto de arquivo).`; renderList(); refresh();
@@ -2373,7 +2476,31 @@ $('tbFile').addEventListener('change', async () => {
     else $('tbDesc').innerHTML = '<b>Não consegui ler esse arquivo.</b> Use um arquivo salvo por este laboratório ou um texto com frequência e nível em cada linha.';
   }
 });
-$('tbClearBtn').addEventListener('click', () => { comps = []; markCustom(); renderList(); refresh(); });
+function hideToast() { clearTimeout(toastT); $('tbToast').hidden = true; undoList = null; }
+$('tbClearBtn').addEventListener('click', () => {
+  if (!comps.length) return;
+  undoList = { comps: comps.map(c => ({ ...c, v: c.v ? { ...c.v } : null })), presetId, desc: $('tbDesc').innerHTML, mainV: { ...mainV } };
+  comps = []; markCustom(); renderList(); refresh();
+  $('tbToastTxt').textContent = 'Lista limpa.'; $('tbToast').hidden = false; clearTimeout(toastT); toastT = setTimeout(hideToast, 10000);
+});
+$('tbUndo').addEventListener('click', () => {
+  if (!undoList) return; const u = undoList; hideToast();
+  comps = u.comps; mainV = u.mainV; presetId = u.presetId; $('tbPreset').value = presetId === 'x' ? 'meu' : presetId; $('tbDesc').innerHTML = u.desc;
+  renderList(); refresh();
+});
+$('tbEqualize').addEventListener('click', () => { equalize(); drawAll(); });
+
+/* ---------- Menu de arquivo ---------- */
+function menuOpen(on) { $('tbMenu').hidden = !on; $('tbFileBtn').setAttribute('aria-expanded', on); if (on) $('tbMenu').querySelector('button').focus(); }
+$('tbFileBtn').addEventListener('click', e => { e.stopPropagation(); menuOpen($('tbMenu').hidden); });
+$('tbMenu').addEventListener('click', e => { if (e.target.closest('button')) menuOpen(false); });
+document.addEventListener('click', e => { if (!$('tbMenu').hidden && !e.target.closest('.tb-filewrap')) menuOpen(false); });
+$('tbMenu').addEventListener('keydown', e => {
+  const items = [...$('tbMenu').querySelectorAll('button')], i = items.indexOf(document.activeElement);
+  if (e.key === 'Escape') { e.preventDefault(); menuOpen(false); $('tbFileBtn').focus(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+});
 
 /* ---------- Som ---------- */
 let ac = null, master = null, playing = false; const voices = new Map(); const LEVEL = 0.22;
@@ -2414,21 +2541,19 @@ function stop() {
   for (const v of voices.values()) v.o.stop(t + 0.08); voices.clear(); playing = false; renderPlay();
 }
 function renderPlay() {
-  $('tbPlay').setAttribute('aria-pressed', playing); $('tbPlayTxt').textContent = playing ? 'Parar' : 'Tocar';
-  $('tbPlayIco').innerHTML = playing ? '<rect x="3.5" y="3.5" width="9" height="9" rx="1"/>' : '<path d="M4 2.5v11l9-5.5z"/>';
+  $('tbPlay').setAttribute('aria-pressed', playing); $('tbPlay').setAttribute('aria-label', playing ? 'Parar' : 'Tocar'); $('tbPlay').title = playing ? 'Parar (espaço)' : 'Tocar (espaço)';
+  $('tbPlayIco').innerHTML = playing ? '<rect x="3.5" y="3.5" width="9" height="9" rx="1"/>' : '<path d="M4.5 2.5v11l9-5.5z"/>';
 }
 $('tbPlay').addEventListener('click', () => playing ? stop() : play());
 
 /* ---------- Zoom, cursor e redesenho ---------- */
-$('tbZin').addEventListener('click', () => { zoom = Math.max(-4, zoom - 1); refresh(); });
-$('tbZout').addEventListener('click', () => { zoom = Math.min(9, zoom + 1); refresh(); });
-$('tbZhome').addEventListener('click', () => { zoom = 0; refresh(); });
+zoomCtl($('tbMainBox'), () => mainV, fitMain, () => { renderInfo(); drawMain(); }, 'gráfico da soma');
 $('tbMain').addEventListener('pointermove', e => { const r = $('tbMain').getBoundingClientRect(); hoverX = e.clientX - r.left; drawMain(); });
 $('tbMain').addEventListener('pointerleave', () => { hoverX = null; drawMain(); });
 ro.observe($('tbMain')); ro.observe($('tbSpec'));
 
 buildPresetSel();
-loadPreset('quadrada');
+loadPreset('seno');
 
 return {
   stop, drawAll,
@@ -2437,10 +2562,6 @@ return {
   name: () => presetId !== 'meu' && presetId !== 'x' ? (PRESETS.find(p => p.id === presetId)?.n || 'Meu timbre') : 'Meu timbre'
 };
 })();
-$('tbToKb').addEventListener('click', () => {
-  TB.stop(); KB.inst = 'meu'; $('instSel').value = 'meu'; renderInst(); setMode('kb');
-});
-
 function readCol() { const cs = getComputedStyle(document.documentElement), G2 = k => cs.getPropertyValue(k).trim(); COL = { screen: G2('--screen'), grid: G2('--screen-grid'), ink: G2('--screen-ink'), hi: G2('--screen-hi'), curve: G2('--curve'), marker: G2('--marker'), wave: G2('--wave') }; }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { readCol(); TB.drawAll(); });
 new MutationObserver(() => { readCol(); TB.drawAll(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -2464,9 +2585,7 @@ try { initAudio(); } catch (e) { console.warn(e); }
 resize();
 window.addEventListener('resize', () => { clearTimeout(window._rz2); window._rz2 = setTimeout(resize, 100); });
 requestAnimationFrame(loop);
-setMode('tb');
+setMode('tb'); applyCompact();
 })();
 </script>
-
-</body>
 </html>
